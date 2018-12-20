@@ -1,13 +1,9 @@
 # Vasto
 
-[![Build Status](https://travis-ci.org/chrislusf/vasto.svg?branch=master)](https://travis-ci.org/chrislusf/vasto)
-[![GoDoc](https://godoc.org/github.com/chrislusf/vasto/goclient/vs?status.svg)](https://godoc.org/github.com/chrislusf/vasto/goclient/vs)
-[![Go Report Card](https://goreportcard.com/badge/github.com/chrislusf/vasto)](https://goreportcard.com/report/github.com/chrislusf/vasto)
-[![codecov](https://codecov.io/gh/chrislusf/vasto/branch/master/graph/badge.svg)](https://codecov.io/gh/chrislusf/vasto)
 
 A distributed high-performance key-value store. On Disk. Eventual consistent. HA. Able to grow or shrink without service interruption.
 
-Vasto scales embedded [RocksDB](https://github.com/facebook/rocksdb) into a distributed key-value store,
+Vasto scales embedded  into a distributed key-value store,
 adding sharding, replication, and support operations to
 1. create a new keyspace
 1. delele an existing keyspace
@@ -70,7 +66,7 @@ When the master receives a request to resize the keyspace from m shards to n sha
 
 # Hashing algorithm
 
-Vasto used [Jumping Consistent Hash](https://arxiv.org/abs/1406.2294) to allocate data. This algorithm
+Vasto used  to allocate data. This algorithm
 1. requires no storage. The master only need soft state to manage all store servers. It is OK to restart master.
 1. evenly distribute the data into buckets.
 1. when the number of bucket changes, it can also evenly dividing the workload.
@@ -90,31 +86,3 @@ when the primary replica is down, or in a different data center.
 Vasto assumes the data already has the event time. It should be the time when the event really happens, not the
 time when the data is feed into Vasto system. If the system fails over to the replica partition, and there are
 multiple changes to one key, the one with latest event times will win.
-
-# Client APIs
-
-See https://godoc.org/github.com/chrislusf/vasto/goclient/vs
-
-## Example
-
-```go
-    // create a vasto client talking to master at localhost:8278, in data center dc1
-    c := vs.NewVastoClient(context.Background(), "client_name", "localhost:8278")
-    
-    // create a cluster for keyspace ks1, in data center dc1, with one server, and one copy of data.
-    c.CreateCluster("ks1", 1, 1)
-    
-    // get a cluster client for ks1
-    ks := c.NewClusterClient("ks1")
-
-    var key, value []byte
-    ...
-    ks.Put(key, value)    
-    ...
-
-    data, _, _ := ks.Get(vs.Key(key))
-    ...
-```
-
-
-Currently only basic go library is provided. The gateway is not ready yet.
